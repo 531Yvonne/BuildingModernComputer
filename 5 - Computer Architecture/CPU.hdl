@@ -1,0 +1,89 @@
+// This file is part of www.nand2tetris.org
+// and the book "The Elements of Computing Systems"
+// by Nisan and Schocken, MIT Press.
+// File name: projects/05/CPU.hdl
+
+/**
+ * The Hack CPU (Central Processing unit), consisting of an ALU,
+ * two registers named A and D, and a program counter named PC.
+ * The CPU is designed to fetch and execute instructions written in 
+ * the Hack machine language. In particular, functions as follows:
+ * Executes the inputted instruction according to the Hack machine 
+ * language specification. The D and A in the language specification
+ * refer to CPU-resident registers, while M refers to the external
+ * memory location addressed by A, i.e. to Memory[A]. The inM input 
+ * holds the value of this location. If the current instruction needs 
+ * to write a value to M, the value is placed in outM, the address 
+ * of the target location is placed in the addressM output, and the 
+ * writeM control bit is asserted. (When writeM==0, any value may 
+ * appear in outM). The outM and writeM outputs are combinational: 
+ * they are affected instantaneously by the execution of the current 
+ * instruction. The addressM and pc outputs are clocked: although they 
+ * are affected by the execution of the current instruction, they commit 
+ * to their new values only in the next time step. If reset==1 then the 
+ * CPU jumps to address 0 (i.e. pc is set to 0 in next time step) rather 
+ * than to the address resulting from executing the current instruction. 
+ */
+
+CHIP CPU {
+
+    IN  inM[16],         // M value input  (M = contents of RAM[A])
+        instruction[16], // Instruction for execution
+        reset;           // Signals whether to re-start the current
+                         // program (reset==1) or continue executing
+                         // the current program (reset==0).
+
+    OUT outM[16],        // M value output
+        writeM,          // Write to M? 
+        addressM[15],    // Address in data memory (of M)
+        pc[15];          // address of next instruction
+
+    PARTS:
+    // Build DRegister's load control bit: C-Instruction And dest contains D
+    And(a=instruction[4], b=instruction[15], out=loadDRegister);
+    
+    // Implement DRegister
+    DRegister(in=outALU, load=loadDRegister, out=outDRegister);
+    
+    // Build ARegister's load control bit: A-Instruction Or dest contains A
+    Not(in=instruction[15], out=notInstruction15);
+    Or(a=instruction[5], b=notInstruction15, out=loadARegister);
+    
+    // Select ALU output or instruction[16] input to feed ARegister using Mux16
+    Mux16(a=instruction, b=outALU, sel=instruction[15], out=outACInstruction);
+
+    // Implement ARegister and get addressM output
+    ARegister(in=outACInstruction, load=loadARegister, out=outARegister, out[0..14]=addressM);
+    
+    // Select A or M input to feed in ALU using Mux16
+    Mux16(a=outARegister, b=inM, sel=instruction[12], out=outAM);
+    
+    // Implement ALU
+    ALU(x=outDRegister, y=outAM,
+        zx=instruction[11], nx=instruction[10],
+        zy=instruction[9], ny=instruction[8],
+        f=instruction[7], no=instruction[6],
+        out=outM, out=outALU, ng=ngOut, zr=zrOut);
+    
+    // Implement writeM: when C-Instruction And dest contains M
+    And(a=instruction[3], b=instruction[15], out=writeM);
+
+    // Implement load control bit for pc
+    // Since all 3 cases require C-Instruction, check instruction[15] utill combine step
+    // Case 1: ALU result is negative And jump when < 0 (JLT)
+    And(a=instruction[2], b=ngOut, out=outCase1);
+    // Case 2: ALU result is 0 And jump when = 0 (JEQ)
+    And(a=instruction[1], b=zrOut, out=outCase2);
+    // Case 3: ALU result is positive (ng = 0, zr = 0) And jump when > 0 (JGT)
+    Not(in=ngOut, out=notngOut);
+    Not(in=zrOut, out=notzrOut);
+    And(a=notngOut, b=notzrOut, out=outPositive);
+    And(a=instruction[0], b=outPositive, out=outCase3);
+    // Combine 3 cases
+    Or(a=outCase1, b=outCase2, out=OrCase12);
+    Or(a=OrCase12, b=outCase3, out=OrCase123);
+    // Check C-Instruction for all 3 cases
+    And(a=instruction[15], b=OrCase123, out=pcLoad);
+    // Implement pc
+    PC(in=outARegister, load=pcLoad, inc=true, reset=reset, out[0..14]=pc);
+}

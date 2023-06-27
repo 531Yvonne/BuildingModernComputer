@@ -1,0 +1,148 @@
+// Project 9: DiamondHunter Game
+//
+// Yves Yang
+//
+// Policeman.jack File
+
+/** Represent a Policeman character. */
+class Policeman {
+
+    field int location; // screen location of the Policeman.
+    field int row, col; // screen location data converted to 256x32 words grid.
+    field boolean reverse; // reverse character when hit border.
+
+    /** Construct a new policeman at random location with a moving pattern. */
+    constructor Policeman new() {
+
+        do Random.setSeed(Random.rand());
+        let row = Random.randRange(210) + 20;
+        let col = Random.randRange(26) + 2;  // Add 2 columns to avoid overlap with thief or diamond
+        let location = row * 32 + col;
+        let reverse = false;
+        do drawPoliceman(location);
+        return this;
+    }
+    
+    /** Draw the Policeman on the screen. */
+    method void drawPoliceman(int x) {
+        var int memAddress; 
+        let memAddress = 16384+x;
+        do Memory.poke(memAddress, 1016);
+        do Memory.poke(memAddress +32, 1016);
+        do Memory.poke(memAddress +64, 1016);
+        do Memory.poke(memAddress +96, 8191);
+        do Memory.poke(memAddress +128, 1028);
+        do Memory.poke(memAddress +160, 1460);
+        do Memory.poke(memAddress +192, 1028);
+        do Memory.poke(memAddress +224, 1092);
+        do Memory.poke(memAddress +256, 2044);
+        do Memory.poke(memAddress +288, -3512);
+        do Memory.poke(memAddress +320, -273);
+        do Memory.poke(memAddress +352, 12873);
+        do Memory.poke(memAddress +384, 12808);
+        do Memory.poke(memAddress +416, 520);
+        do Memory.poke(memAddress +448, 1016);
+        do Memory.poke(memAddress +480, 792);
+        do Memory.poke(memAddress +512, 792);
+        do Memory.poke(memAddress +544, 792);
+        do Memory.poke(memAddress +576, 1820);
+        do Memory.poke(memAddress +289, 1);
+        do Memory.poke(memAddress +321, 1);
+        return;
+    }
+
+    /** Erase the Policeman on the screen. */
+    method void erasePoliceman(int x) {
+        var int memAddress; 
+        let memAddress = 16384+x;
+        do Memory.poke(memAddress, 0);
+        do Memory.poke(memAddress +32, 0);
+        do Memory.poke(memAddress +64, 0);
+        do Memory.poke(memAddress +96, 0);
+        do Memory.poke(memAddress +128, 0);
+        do Memory.poke(memAddress +160, 0);
+        do Memory.poke(memAddress +192, 0);
+        do Memory.poke(memAddress +224, 0);
+        do Memory.poke(memAddress +256, 0);
+        do Memory.poke(memAddress +288, 0);
+        do Memory.poke(memAddress +320, 0);
+        do Memory.poke(memAddress +352, 0);
+        do Memory.poke(memAddress +384, 0);
+        do Memory.poke(memAddress +416, 0);
+        do Memory.poke(memAddress +448, 0);
+        do Memory.poke(memAddress +480, 0);
+        do Memory.poke(memAddress +512, 0);
+        do Memory.poke(memAddress +544, 0);
+        do Memory.poke(memAddress +576, 0);
+        do Memory.poke(memAddress +289, 0);
+        do Memory.poke(memAddress +321, 0);
+        return;
+    }
+   
+    /** Move the Policeman on the screen. */
+    method void move() {
+        if (row = 230) {
+            let reverse = ~reverse;
+        }
+        if (row = 20) {
+            let reverse = ~reverse;
+        }
+        if (reverse) {
+            do moveUp();
+        }
+        else {
+            do moveDown();
+        }
+        return;
+    }
+
+    /** Create n policeman */
+    function Array creatPoliceman(int x) {
+        var int number_of_police, i;
+        var Array arr;
+        let number_of_police = x;
+        let arr = Array.new(number_of_police);
+        let i = 0;
+        while (i < number_of_police) {
+            let arr[i] = Policeman.new();
+            let i = i + 1;
+        }
+        return arr;
+    }
+
+
+    /** Move the character up by 1 unit. */
+    method void moveUp() {
+        // Can only move up within game border.
+        if (row > 20) {
+            do erasePoliceman(location);
+            let location = location - 32;
+            let row = row - 1;
+            do drawPoliceman(location);
+        }
+        return;
+    }
+
+    /** Move the character down by 1 unit. */
+    method void moveDown() {
+        // Can only move down within game border.
+        if (row < 230) {
+            do erasePoliceman(location);
+            let location = location + 32;
+            let row = row + 1;
+            do drawPoliceman(location);
+        }
+        return;
+    }
+
+    /** Accessor for Policeman class's location attibute */
+    method int getLocation() {     
+        return location;
+    }
+
+    /** Disposes this Policeman character. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

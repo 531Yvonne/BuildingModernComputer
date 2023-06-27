@@ -1,0 +1,40 @@
+// Project 9: DiamondHunter Game
+//
+// Yves Yang
+//
+// Random.jack File
+
+// Generate random int number (Implemention referred to https://gist.github.com/ybakos/7ca67fcfd07477a9550b)
+
+class Random {
+    static int seed;
+    
+    function void setSeed(int x) {
+        let seed = x;
+        return;
+    }
+
+    function int rand() {
+        /** return a random number in the range 0..32767 */
+        let seed = seed + 20251;
+        if (seed < 0) {
+            let seed = seed - 32767 - 1;
+        }
+        return seed;
+    }
+
+    function int randRange(int range) {
+        /** return a random number in the range 0..range */
+        var int mask;
+        var int result;
+        let mask = 1;
+        while (mask < range) {
+            let mask = mask * 2 + 1;
+        }
+        let result = Random.rand() & mask;
+        while (result > range) {
+            let result = Random.rand() & mask;
+        }
+        return result;
+    }
+}

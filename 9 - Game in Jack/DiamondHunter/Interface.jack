@@ -1,0 +1,83 @@
+// Project 9: DiamondHunter Game
+//
+// Yves Yang
+//
+// Interface.jack File
+
+/** Implement the game interface. */
+class Interface {
+
+    field bool start, end;
+
+    constructor Interface new() {
+        do printWelcome();
+        do printTitle();
+        do drawGameBorder();
+        return this;
+    }
+
+    /** Print Game Title at top*/
+    method void printTitle() {
+        do Output.moveCursor(0, 24);
+        do Output.printString("DIAMOND HUNTER");
+        return;
+    }
+
+    /** Draw Line below the title */
+    method void drawGameBorder() {
+        do Screen.setColor(true);
+        do Screen.drawRectangle(10, 16, 500, 18);       // top border
+        do Screen.drawRectangle(10, 250, 500, 252);     // bottom border
+        do Screen.drawRectangle(10, 16, 12, 252);       // left border
+        do Screen.drawRectangle(497, 16, 500, 252);     // right border
+        return;
+    }
+
+    /** Print Welcome! */
+    method void printWelcome() {
+        var boolean start;
+        var int key;
+        let start = false;
+        do Output.moveCursor(8, 24);
+        do Output.printString("DIAMOND HUNTER");   
+        do Output.moveCursor(12, 13);
+        do Output.printString("Steal the Diamond and Don't Get Caught!");
+        do Output.moveCursor(16, 23);
+        do Output.printString("Control by Arrows");
+        do Output.moveCursor(17, 23);
+        do Output.printString("Press P to Start!");
+        while (~start) {
+            let key = Keyboard.keyPressed();
+            if (key = 80) {
+                let start = true;
+            }
+        }
+        do Screen.clearScreen();
+        return;
+    }
+
+    /** Print Result */
+    method void printResult(int x) {
+        var int result;
+        let result = x;
+
+        do Screen.clearScreen();
+        if (result = 1) {
+            do Output.moveCursor(8, 20);
+            do Output.printString("Yes! You got the Diamond!");
+        }
+        else {
+            do Output.moveCursor(8, 24);
+            do Output.printString("You're Caught!");
+        }
+        do Output.moveCursor(15, 14);
+        do Output.printString("Press P to play again! Press Q to quit!");
+        return;
+    }
+
+    /** Dispose the interface. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

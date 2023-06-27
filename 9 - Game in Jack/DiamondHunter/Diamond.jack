@@ -1,0 +1,71 @@
+// Project 9: DiamondHunter Game
+//
+// Yves Yang
+//
+// Diamond.jack File
+
+/** Implement a graphical diamond. */
+class Diamond {
+
+    field int location; // screen location of the diamond
+    field int row, col; // screen location data converted to 256x32 words grid.
+
+    /** Construct a new diamond at random location at right side. */
+    constructor Diamond new() {
+        do Random.setSeed(Random.rand());
+        let row = Random.randRange(210) + 20;
+        let col = 30;
+        let location = row * 32 + col;
+        do drawDiamond(location);
+        return this;
+    }
+
+    /** Draw a diamond at given location. */
+    method void drawDiamond(int location) {
+        // Jack Code generated using provided Bitmap Editor
+        var int memAddress; 
+        let memAddress = 16384+location;
+        do Memory.poke(memAddress +64, 4088);
+        do Memory.poke(memAddress +32, 0);
+        do Memory.poke(memAddress +96, 8188);
+        do Memory.poke(memAddress +128, 16382);
+        do Memory.poke(memAddress +160, 29223);
+        do Memory.poke(memAddress +192, 14670);
+        do Memory.poke(memAddress +224, 7516);
+        do Memory.poke(memAddress +256, 3768);
+        do Memory.poke(memAddress +288, 2032);
+        do Memory.poke(memAddress +320, 992);
+        do Memory.poke(memAddress +352, 448);
+        do Memory.poke(memAddress +384, 128);
+        return;
+    }
+
+    method void eraseDiamond(int location) {
+        var int memAddress; 
+        let memAddress = 16384+location;
+        do Memory.poke(memAddress +64, 0);
+        do Memory.poke(memAddress +32, 0);
+        do Memory.poke(memAddress +96, 0);
+        do Memory.poke(memAddress +128, 0);
+        do Memory.poke(memAddress +160, 0);
+        do Memory.poke(memAddress +192, 0);
+        do Memory.poke(memAddress +224, 0);
+        do Memory.poke(memAddress +256, 0);
+        do Memory.poke(memAddress +288, 0);
+        do Memory.poke(memAddress +320, 0);
+        do Memory.poke(memAddress +352, 0);
+        do Memory.poke(memAddress +384, 0);
+        return;
+    }
+
+    /** Accessor for Diamond class's location attibute */
+    method int getLocation() {     
+        return location;
+    }
+    
+    /** Dispose this Diamond. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

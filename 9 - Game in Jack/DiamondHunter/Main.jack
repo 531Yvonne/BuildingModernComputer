@@ -1,0 +1,15 @@
+// Project 9: DiamondHunter Game
+//
+// Yves Yang
+//
+// Main.jack File
+
+/** Initializes a new game and starts running it. */
+class Main {
+    function void main() {
+        var GamePlay game;
+        let game = GamePlay.new();
+        do game.dispose();
+        return;
+    }
+}

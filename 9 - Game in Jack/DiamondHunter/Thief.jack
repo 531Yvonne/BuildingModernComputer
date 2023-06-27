@@ -1,0 +1,158 @@
+// Project 9: DiamondHunter Game
+//
+// Yves Yang
+//
+// Thief.jack File
+
+/** Represent the thief character. */
+class Thief {
+
+    field int location; // location of the character.
+    field int row, col; // screen location data converted to 256x32 words grid.
+
+    constructor Thief new(int x) {
+        let location = x;
+        let row = location / 32;
+        let col = location - (row * 32);
+        do drawThief(location);
+        return this;
+    }
+
+    /** Draw the thief character on the screen at specific location. */
+    method void drawThief(int x) {
+        // Jack Code generated using provided Bitmap Editor
+        var int memAddress; 
+        let memAddress = 16384+x;
+        do Memory.poke(memAddress, 1022);
+        do Memory.poke(memAddress +32, 2047);
+        do Memory.poke(memAddress +64, 1539);
+        do Memory.poke(memAddress +96, 1533);
+        do Memory.poke(memAddress +128, 1501);
+        do Memory.poke(memAddress +160, 1025);
+        do Memory.poke(memAddress +192, 1137);
+        do Memory.poke(memAddress +224, 1025);
+        do Memory.poke(memAddress +256, 2047);
+        do Memory.poke(memAddress +288, 2047);
+        do Memory.poke(memAddress +320, 1025);
+        do Memory.poke(memAddress +352, 2047);
+        do Memory.poke(memAddress +384, 2047);
+        do Memory.poke(memAddress +416, 1025);
+        do Memory.poke(memAddress +448, 2047);
+        do Memory.poke(memAddress +480, 2047);
+        do Memory.poke(memAddress +512, 396);
+        do Memory.poke(memAddress +544, 396);
+        do Memory.poke(memAddress +576, 396);
+        return;
+    }
+
+    /** Erase the thief character on the screen at specific location. */
+    method void eraseThief(int x) {
+        var int memAddress; 
+        let memAddress = 16384+x;
+        do Memory.poke(memAddress, 0);
+        do Memory.poke(memAddress +32, 0);
+        do Memory.poke(memAddress +64, 0);
+        do Memory.poke(memAddress +96, 0);
+        do Memory.poke(memAddress +128, 0);
+        do Memory.poke(memAddress +160, 0);
+        do Memory.poke(memAddress +192, 0);
+        do Memory.poke(memAddress +224, 0);
+        do Memory.poke(memAddress +256, 0);
+        do Memory.poke(memAddress +288, 0);
+        do Memory.poke(memAddress +320, 0);
+        do Memory.poke(memAddress +352, 0);
+        do Memory.poke(memAddress +384, 0);
+        do Memory.poke(memAddress +416, 0);
+        do Memory.poke(memAddress +448, 0);
+        do Memory.poke(memAddress +480, 0);
+        do Memory.poke(memAddress +512, 0);
+        do Memory.poke(memAddress +544, 0);
+        do Memory.poke(memAddress +576, 0);
+        return;
+    }
+
+    /* Move the thief character up by 1 unit. */
+    method void moveUp() {
+        // Can only move up within game border.
+        if (row > 20) {
+            do eraseThief(location);
+            let location = location - 32;
+            let row = row - 1;
+            do drawThief(location);
+        }
+        return;
+    }
+
+    /* Move the thief character down by 1 unit. */
+    method void moveDown() {
+        // Can only move down within game border.
+        if (row < 230) {
+            do eraseThief(location);
+            let location = location + 32;
+            let row = row + 1;
+            do drawThief(location);
+        }
+        return;
+    }
+
+    /* Move the thief character left by 1 unit. */
+    method void moveLeft() {
+        // Can only move left within game border.
+        if (col > 1) {
+            do eraseThief(location);
+            let location = location - 1;
+            let col = col - 1;
+            do drawThief(location);
+        }
+        return;
+    }
+
+    /* Move the thief character right by 1 unit. */
+    method void moveRight() {
+        // Can only move right within game border.
+        if (col < 30) {
+            do eraseThief(location);
+            let location = location + 1;
+            let col = col + 1;
+            do drawThief(location);
+        }
+        return;
+    }
+
+    /** Enable thief moves. */
+    method void move(int key) {
+        if (key = 131) {
+            do moveUp(); 
+            do Sys.wait(1);
+            return;
+        }  
+        if (key = 133) {
+            do moveDown();
+            do Sys.wait(1);
+            return;
+        }
+        if (key = 130) {
+            do moveLeft(); 
+            do Sys.wait(3);
+            return;
+        }
+        if (key = 132) {
+            do moveRight(); 
+            do Sys.wait(3);
+            return;
+        }
+        do Sys.wait(2);
+        return;
+    }
+    
+    /** Accessor for Thief class's location attibute */
+    method int getLocation() {     
+        return location;
+    }
+
+    /* Dispose the thief character. */
+    method void dispose() {
+        do Memory.deAlloc(this);
+        return;
+    }
+}

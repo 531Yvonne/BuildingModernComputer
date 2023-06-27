@@ -1,0 +1,106 @@
+// Project 9: DiamondHunter Game
+//
+// Yves Yang
+//
+// GamePlay.jack File
+
+class GamePlay {
+    field Interface interface;
+    field Thief thief;
+    field Diamond diamond;
+    field int number_of_police;
+    field Array police;
+
+    /** Construct a new Game. */
+    constructor GamePlay new() {
+        var int key, result, i;
+        var boolean haveResult, continuePlay, replay;
+        var Policeman p;
+        
+        let continuePlay = true;
+        while (continuePlay) {
+            let interface = Interface.new();    // Create Game Interface
+            let thief = Thief.new(4001);        // Initiate the thief
+            let diamond = Diamond.new();        // Create the Diamond
+            let number_of_police = 40;          // Here can change number of policeman :)
+            let police = Policeman.creatPoliceman(number_of_police);  // Create a group of Police 
+            let haveResult = false;
+            while (~haveResult) {
+                let key = Keyboard.keyPressed();
+                do thief.move(key);             // Capture User's move
+                let i = 0;
+                while (i < number_of_police) {
+                    let p = police[i];
+                    do p.move();                // Activate Policeman's moves
+                    let i = i + 1;
+                }
+                let result = getResult();
+                if (result > 0){
+                    do interface.printResult(result);
+                    let haveResult = true;
+                }
+            }
+            let replay = GamePlay.checkReplay();    // Check whether replay.
+            if (~replay) {
+                let continuePlay = false;
+                do diamond.dispose(); // dispose items from previous round.
+                do thief.dispose();
+                do police.dispose();
+                do interface.dispose();
+            }
+        }
+        return this;
+    }
+
+    /** Track Game Result. */
+    method int getResult() {
+        var int l_t, l_d, l_p, i;
+        var Policeman p;
+        let l_t = thief.getLocation();
+        let l_d = diamond.getLocation();
+        
+        if (l_t = l_d) {    // Got the Diamond.
+            return 1;
+        } 
+
+        let i = 0;
+        while (i < number_of_police) {
+            let p = police[i];
+            let l_p = p.getLocation();       
+            if (l_t = l_p) {           // Got caught
+                return 2;
+            }
+            let i = i + 1;
+        }
+        return 0;        // Neither got the diamond nor got caught.
+    }
+
+    /** Check Replay */
+    function boolean checkReplay() {
+        var boolean end, replay;
+        var int key;
+        let end = false;
+        while (~end) {
+            let key = Keyboard.keyPressed();
+            if (key = 80) {
+                let replay = true;
+                let end = true;
+            }
+            if (key = 81) {
+                let replay = false;
+                let end = true;
+            }
+        }
+        return replay;
+    }
+
+    /** Disposes this game. */
+    method void dispose() {
+        do diamond.dispose();
+        do thief.dispose();
+        do police.dispose();
+        do interface.dispose();
+        do Memory.deAlloc(this);
+        return;
+    }
+}
