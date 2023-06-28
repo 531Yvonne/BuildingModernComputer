@@ -1,6 +1,9 @@
 # Building a Modern Computer
 This is a Project based on Nand2Tetris, which builds a modern computer from scratch at both hardware and software level.
 
+# Video Demo
+[![Watch the video](https://img.youtube.com/vi/E6q1FZwOOzY/0.jpg)](https://youtu.be/E6q1FZwOOzY)
+
 # Overview
 ## Logic Chips
 
